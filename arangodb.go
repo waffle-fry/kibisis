@@ -35,16 +35,16 @@ func (arangodb *ArangoDb) Conn() error {
 }
 
 // Init - Connects to the target database using the client
-func (arangodb *ArangoDb) Init() error {
+func (arangodb *ArangoDb) Init(database, collection string) error {
 	var err error
 
-	arangodb.Database, err = arangodb.Client.Database(nil, "events")
+	arangodb.Database, err = arangodb.Client.Database(nil, database)
 
 	if err != nil {
 		return fmt.Errorf("Failed to initialise database: %v", err)
 	}
 
-	arangodb.Collection, err = arangodb.Database.Collection(nil, "events")
+	arangodb.Collection, err = arangodb.Database.Collection(nil, collection)
 
 	return nil
 }
