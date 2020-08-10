@@ -1,4 +1,4 @@
-module github.com/shaaaanks/go-api/kibisis
+module github.com/shaaaanks/kibisis
 
 go 1.14
 
