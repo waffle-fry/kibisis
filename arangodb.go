@@ -15,9 +15,9 @@ type ArangoDb struct {
 }
 
 // Conn - Creates a database client
-func (arangodb *ArangoDb) Conn() error {
+func (arangodb *ArangoDb) Conn(host []string, username string, password string) error {
 	conn, err := http.NewConnection(http.ConnectionConfig{
-		Endpoints: []string{"http://localhost:8529"},
+		Endpoints: host,
 	})
 	if err != nil {
 		return fmt.Errorf("Failed to connect to database: %v", err)
@@ -25,7 +25,7 @@ func (arangodb *ArangoDb) Conn() error {
 
 	arangodb.Client, err = driver.NewClient(driver.ClientConfig{
 		Connection:     conn,
-		Authentication: driver.BasicAuthentication("root", "root"),
+		Authentication: driver.BasicAuthentication(username, password),
 	})
 	if err != nil {
 		return fmt.Errorf("Failed to create database client: %v", err)
