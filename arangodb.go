@@ -92,9 +92,20 @@ func (arangodb *ArangoDb) Find(id string) (interface{}, error) {
 }
 
 // FindAll - Get a collection of items from the database
-func (arangodb *ArangoDb) FindAll() ([]interface{}, error) {
+func (arangodb *ArangoDb) FindAll(where []string, sort []string, limit int) ([]interface{}, error) {
 	ctx := context.Background()
-	query := fmt.Sprintf("FOR d in %v RETURN d", arangodb.Collection.Name())
+	query := fmt.Sprintf("FOR d in %v", arangodb.Collection.Name())
+	if where != nil {
+		query = fmt.Sprintf("%v FILTER d.%v %v \"%v\"", query, where[0], where[1], where[2])
+	}
+	if sort != nil {
+		query = fmt.Sprintf("%v SORT d.%v %v", query, sort[0], sort[1])
+	}
+	if limit != 0 {
+		query = fmt.Sprintf("%v LIMIT %v", query, limit)
+	}
+	query = fmt.Sprintf("%v RETURN d", query)
+
 	cursor, err := arangodb.Database.Query(ctx, query, nil)
 	if err != nil {
 		return nil, fmt.Errorf("Error finding items: %v", err)

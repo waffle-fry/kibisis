@@ -8,5 +8,5 @@ type Database interface {
 	Update(id string, item interface{}) error
 	Delete(id string) error
 	Find(id string) (interface{}, error)
-	FindAll() ([]interface{}, error)
+	FindAll(where []string, sort []string, limit int) ([]interface{}, error)
 }
