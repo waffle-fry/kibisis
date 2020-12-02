@@ -1,4 +1,4 @@
-module github.com/shaaaanks/kibisis
+module github.com/waffle-fry/kibisis
 
 go 1.14
 
