@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -57,23 +58,52 @@ func (mongodb *MongoDb) Create(item interface{}) error {
 
 // Find - Get a single item from the database
 func (mongodb *MongoDb) Find(id string) (interface{}, error) {
+	filter := bson.M{"_id": id}
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	var result bson.M
+	err := mongodb.Collection.FindOne(ctx, filter).Decode(&result)
+	if err != nil {
+		return nil, fmt.Errorf("Error finding item: %v", err)
+	}
 
-	return nil, fmt.Errorf("Error finding item")
+	return result, nil
 }
 
 // FindAll - Get a collection of items from the database
 func (mongodb *MongoDb) FindAll(where []string, sort []string, limit int) ([]interface{}, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	cur, err := mongodb.Collection.Find(ctx, bson.D{})
+	if err != nil {
+		return nil, fmt.Errorf("Error finding items: %v", err)
+	}
+	defer cur.Close(ctx)
+	var results []interface{}
 
-	return nil, fmt.Errorf("Error finding items")
+	for cur.Next(ctx) {
+		var result bson.M
+		err := cur.Decode(&result)
+		if err != nil {
+			return nil, fmt.Errorf("Error finding items: %v", err)
+		}
+
+		results = append(results, result)
+	}
+	if err := cur.Err(); err != nil {
+		return nil, fmt.Errorf("Error finding items: %v", err)
+	}
+
+	return results, nil
 }
 
-// Update - Update an item in the database
+// Update - TODO: Update an item in the database
 func (mongodb *MongoDb) Update(id string, item interface{}) error {
 
 	return nil
 }
 
-// Delete - Delete an item from the database
+// Delete - TODO: Delete an item from the database
 func (mongodb *MongoDb) Delete(id string) error {
 
 	return nil
