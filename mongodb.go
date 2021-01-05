@@ -54,7 +54,7 @@ func (mongodb *MongoDb) Create(item interface{}) (string, error) {
 		return "", fmt.Errorf("Error inserting item: %v", err)
 	}
 
-	id := res.InsertedID.(primitive.ObjectID).String()
+	id := res.InsertedID.(primitive.ObjectID).Hex()
 
 	return id, nil
 }
