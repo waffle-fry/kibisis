@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -46,14 +47,16 @@ func (mongodb *MongoDb) Init(database, collection string) error {
 }
 
 // Create - Inserts an item into the database
-func (mongodb *MongoDb) Create(item interface{}) error {
+func (mongodb *MongoDb) Create(item interface{}) (string, error) {
 	ctx := context.Background()
-	_, err := mongodb.Collection.InsertOne(ctx, item)
+	res, err := mongodb.Collection.InsertOne(ctx, item)
 	if err != nil {
-		return fmt.Errorf("Error inserting item: %v", err)
+		return "", fmt.Errorf("Error inserting item: %v", err)
 	}
 
-	return nil
+	id := res.InsertedID.(primitive.ObjectID).String()
+
+	return id, nil
 }
 
 // Find - Get a single item from the database

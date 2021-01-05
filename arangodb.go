@@ -8,6 +8,7 @@ import (
 	"github.com/arangodb/go-driver/http"
 )
 
+// ArangoDb - The ArangoDB instance
 type ArangoDb struct {
 	Client     driver.Client
 	Database   driver.Database
@@ -50,14 +51,14 @@ func (arangodb *ArangoDb) Init(database, collection string) error {
 }
 
 // Create - Inserts an item into the database
-func (arangodb *ArangoDb) Create(item interface{}) error {
+func (arangodb *ArangoDb) Create(item interface{}) (string, error) {
 	ctx := context.Background()
-	_, err := arangodb.Collection.CreateDocument(ctx, item)
+	res, err := arangodb.Collection.CreateDocument(ctx, item)
 	if err != nil {
-		return fmt.Errorf("Error inserting item: %v", err)
+		return "", fmt.Errorf("Error inserting item: %v", err)
 	}
 
-	return nil
+	return res.ID.String(), nil
 }
 
 // Find - Get a single item from the database
