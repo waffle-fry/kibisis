@@ -3,6 +3,7 @@ package kibisis
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -61,11 +62,18 @@ func (mongodb *MongoDb) Create(item interface{}) (string, error) {
 
 // Find - Get a single item from the database
 func (mongodb *MongoDb) Find(id string) (interface{}, error) {
-	filter := bson.M{"_id": id}
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		log.Println("Invalid id")
+	}
+
+	filter := bson.M{"_id": objectID}
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
+
 	var result bson.M
-	err := mongodb.Collection.FindOne(ctx, filter).Decode(&result)
+
+	err = mongodb.Collection.FindOne(ctx, filter).Decode(&result)
 	if err != nil {
 		return nil, fmt.Errorf("Error finding item: %v", err)
 	}
