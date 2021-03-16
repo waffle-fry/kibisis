@@ -87,7 +87,7 @@ func (mongodb *MongoDb) FindAll(where []string, sort []string, limit int) ([]int
 	if where != nil {
 		filter := bson.M{where[0]: where[1]}
 	} else {
-		filter = bson.M{}
+		filter := bson.M{}
 	}
 	defer cancel()
 	cur, err := mongodb.Collection.Find(ctx, filter)
