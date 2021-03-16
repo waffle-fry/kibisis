@@ -84,10 +84,9 @@ func (mongodb *MongoDb) Find(id string) (interface{}, error) {
 // FindAll - Get a collection of items from the database
 func (mongodb *MongoDb) FindAll(where []string, sort []string, limit int) ([]interface{}, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	filter := bson.M{}
 	if where != nil {
-		filter := bson.M{where[0]: where[1]}
-	} else {
-		filter := bson.M{}
+		filter = bson.M{where[0]: where[1]}
 	}
 	defer cancel()
 	cur, err := mongodb.Collection.Find(ctx, filter)
