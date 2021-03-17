@@ -86,7 +86,11 @@ func (mongodb *MongoDb) FindAll(where []string, sort []string, limit int) ([]int
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	filter := bson.M{}
 	if where != nil {
-		filter = bson.M{where[0]: where[1]}
+		var wherebson string[string]
+		for i := 0; i < where.length; i+=2 {
+			wherebson = append(wherebson, where[i]:where[i+1])
+		}
+		filter = bson.M{wherebson}
 	}
 	defer cancel()
 	cur, err := mongodb.Collection.Find(ctx, filter)
