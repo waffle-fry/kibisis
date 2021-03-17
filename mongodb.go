@@ -86,10 +86,10 @@ func (mongodb *MongoDb) FindAll(where []string, sort []string, limit int) ([]int
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	filter := bson.M{}
 	if where != nil {
-		if length(where) == 2 {
+		if len(where) == 2 {
 			filter = bson.M{where[0]:where[1]}
 		}
-		if length(where) == 4 {
+		if len(where) == 4 {
 			filter = bson.M{where[0]:where[1], where[2]:where[3]}
 		}
 	}
