@@ -133,6 +133,11 @@ func (mongodb *MongoDb) Update(id string, item interface{}) error {
 
 // Delete - TODO: Delete an item from the database
 func (mongodb *MongoDb) Delete(id string) error {
+	ctx := context.Background()
+	_, err := mongodb.Collection.DeleteOne(ctx, bson.M{"_id": id})
+	if err != nil {
+		return fmt.Errorf("Error deleting item: %v", err)
+	}
 
 	return nil
 }
