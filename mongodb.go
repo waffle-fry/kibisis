@@ -87,10 +87,10 @@ func (mongodb *MongoDb) FindAll(where []string, sort []string, limit int) ([]int
 	filter := bson.M{}
 	if where != nil {
 		if len(where) == 2 {
-			filter = bson.M{where[0]:where[1]}
+			filter = bson.M{where[0]: where[1]}
 		}
 		if len(where) == 4 {
-			filter = bson.M{where[0]:where[1], where[2]:where[3]}
+			filter = bson.M{where[0]: where[1], where[2]: where[3]}
 		}
 	}
 	defer cancel()
@@ -119,6 +119,14 @@ func (mongodb *MongoDb) FindAll(where []string, sort []string, limit int) ([]int
 
 // Update - TODO: Update an item in the database
 func (mongodb *MongoDb) Update(id string, item interface{}) error {
+	ctx := context.Background()
+	_, err := mongodb.Collection.ReplaceOne(ctx,
+		bson.M{"_id": id},
+		item,
+	)
+	if err != nil {
+		return fmt.Errorf("Error updating item: %v", err)
+	}
 
 	return nil
 }
