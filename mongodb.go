@@ -117,11 +117,16 @@ func (mongodb *MongoDb) FindAll(where []string, sort []string, limit int) ([]int
 	return results, nil
 }
 
-// Update - TODO: Update an item in the database
+// Update: Update an item in the database
 func (mongodb *MongoDb) Update(id string, item interface{}) error {
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		log.Println("Invalid id")
+	}
+
 	ctx := context.Background()
-	_, err := mongodb.Collection.ReplaceOne(ctx,
-		bson.M{"_id": id},
+	_, err = mongodb.Collection.ReplaceOne(ctx,
+		bson.M{"_id": objectID},
 		item,
 	)
 	if err != nil {
@@ -131,10 +136,15 @@ func (mongodb *MongoDb) Update(id string, item interface{}) error {
 	return nil
 }
 
-// Delete - TODO: Delete an item from the database
+// Delete: Delete an item from the database
 func (mongodb *MongoDb) Delete(id string) error {
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		log.Println("Invalid id")
+	}
+
 	ctx := context.Background()
-	_, err := mongodb.Collection.DeleteOne(ctx, bson.M{"_id": id})
+	_, err = mongodb.Collection.DeleteOne(ctx, bson.M{"_id": objectID})
 	if err != nil {
 		return fmt.Errorf("Error deleting item: %v", err)
 	}
