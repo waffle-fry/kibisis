@@ -10,6 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
 // MongoDb - The MongoDB instance
@@ -33,6 +34,11 @@ func (mongodb *MongoDb) Conn(host []string, username string, password string) er
 	client, err := mongo.Connect(ctx, clientOpts)
 	if err != nil {
 		return fmt.Errorf("Failed to connect to database: %v", err)
+	}
+
+	ctx, _ = context.WithTimeout(context.Background(), 10*time.Second)
+	if err = client.Ping(ctx, readpref.Primary()); err != nil {
+		return fmt.Errorf("Failed to connect to database (ping): %v\n", err)
 	}
 
 	mongodb.Client = *client
