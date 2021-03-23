@@ -36,7 +36,6 @@ func (mongodb *MongoDb) Conn(host []string, username string, password string) er
 		return fmt.Errorf("Failed to connect to database: %v", err)
 	}
 
-	ctx, _ = context.WithTimeout(context.Background(), 10*time.Second)
 	if err = client.Ping(ctx, readpref.Primary()); err != nil {
 		return fmt.Errorf("Failed to connect to database (ping): %v\n", err)
 	}
