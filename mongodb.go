@@ -26,7 +26,6 @@ func (mongodb *MongoDb) Conn(host []string, username string, password string) er
 	defer cancel()
 
 	credential := options.Credential{
-		AuthMechanism: "PLAIN",
 		Username:      username,
 		Password:      password,
 	}
