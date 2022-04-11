@@ -25,12 +25,20 @@ func (mongodb *MongoDb) Conn(host []string, username string, password string) er
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	credential := options.Credential{
-		Username:      username,
-		Password:      password,
+	var clientOpts options.ClientOptions
+
+	if username != "" && password != "" {
+		credential := options.Credential{
+			Username: username,
+			Password: password,
+		}
+
+		clientOpts = *options.Client().ApplyURI(host[0]).SetAuth(credential)
+	} else {
+		clientOpts = *options.Client().ApplyURI(host[0])
 	}
-	clientOpts := options.Client().ApplyURI(host[0]).SetAuth(credential)
-	client, err := mongo.Connect(ctx, clientOpts)
+
+	client, err := mongo.Connect(ctx, &clientOpts)
 	if err != nil {
 		return fmt.Errorf("Failed to connect to database: %v", err)
 	}
