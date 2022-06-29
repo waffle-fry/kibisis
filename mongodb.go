@@ -96,17 +96,40 @@ func (mongodb *MongoDb) Find(id string) (interface{}, error) {
 // FindAll - Get a collection of items from the database
 func (mongodb *MongoDb) FindAll(where []string, sort []string, limit int) ([]interface{}, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	filter := bson.M{}
+	var filter primitive.E
 	if where != nil {
 		if len(where) == 2 {
-			filter = bson.M{where[0]: where[1]}
+			filter = primitive.E{Key: "filter", Value: bson.D{{Key: where[0], Value: where[1]}}}
 		}
 		if len(where) == 4 {
-			filter = bson.M{where[0]: where[1], where[2]: where[3]}
+			filter = primitive.E{Key: "filter", Value: bson.D{{Key: where[0], Value: where[1]}, {Key: where[2], Value: where[3]}}}
 		}
 	}
+
+	var sortQuery primitive.E
+	if len(sort) == 2 {
+		var direction = 1
+		if sort[1] == "DESC" {
+			direction = -1
+		}
+		sortQuery = primitive.E{Key: "sort", Value: bson.D{{Key: sort[0], Value: direction}}}
+	}
+
+	var query bson.D
+	if filter.Key == "" || sortQuery.Key == "" {
+		query = bson.D{{Key: "find", Value: mongodb.Collection.Name()}}
+	} else {
+		if filter.Key != "" && sortQuery.Key != "" {
+			query = bson.D{{Key: "find", Value: mongodb.Collection.Name()}, filter, sortQuery}
+		} else if filter.Key != "" {
+			query = bson.D{{Key: "find", Value: mongodb.Collection.Name()}, filter}
+		} else {
+			query = bson.D{{Key: "find", Value: mongodb.Collection.Name()}, sortQuery}
+		}
+	}
+
 	defer cancel()
-	cur, err := mongodb.Collection.Find(ctx, filter)
+	cur, err := mongodb.Collection.Database().RunCommandCursor(ctx, query)
 	if err != nil {
 		return nil, fmt.Errorf("Error finding items: %v", err)
 	}
